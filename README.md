@@ -36,3 +36,15 @@
 
 
 ### kafka steps 
+
+
+
+Verify if topic is created or not 
+
+    docker exec -it kafka-learn kafka-topics --list --bootstrap-server localhost:29092
+
+optional: Create a producer 
+
+
+Create a consumer 
+    docker exec -it kafka-learn kafka-console-consumer --topic topic1234 --bootstrap-server localhost:9092 --from-beginning 

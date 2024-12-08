@@ -23,6 +23,8 @@ public class MessageController {
 
     @Autowired
     private RestTemplate restTemplate;
+    @Autowired
+    private KafkaProducerService producerService;
 
     @GetMapping
     public ResponseEntity<List<Message>> getAllMessages() {
@@ -43,20 +45,22 @@ public class MessageController {
                 message.setId(UUID.randomUUID());
             }
             Message savedMessage = messageRepository.save(message);
+            producerService.sendMessage(message.getMessage());
             // Prepare the payload for Kafka publish
-            String kafkaPublishUrl = "http://localhost:8080/api/kafka/publish";
-            Map<String, String> kafkaMessage = new HashMap<>();
-            kafkaMessage.put("message", "Message with text '" + savedMessage.getMessage() + "' was added to Cassandra");
+            // String kafkaPublishUrl = "http://localhost:8080/api/kafka/publish";
+            // Map<String, String> kafkaMessage = new HashMap<>();
+            // kafkaMessage.put("message", "Message with text '" + savedMessage.getMessage() + "' was added to Cassandra");
 
             // Send the request to KafkaController
-            ResponseEntity<String> kafkaResponse = restTemplate.postForEntity(kafkaPublishUrl, kafkaMessage, String.class);
+            // ResponseEntity<String> kafkaResponse = restTemplate.postForEntity(kafkaPublishUrl, kafkaMessage, String.class);
 
-            if (kafkaResponse.getStatusCode().is2xxSuccessful()) {
+            // if (kafkaResponse.getStatusCode().is2xxSuccessful()) {
                 return ResponseEntity.ok(savedMessage);
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(savedMessage);
-            }
+            // } 
+            // else {
+                // return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        // .body(savedMessage);
+            // }
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
